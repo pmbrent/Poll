@@ -76,6 +76,25 @@ class User < ActiveRecord::Base
       .group("polls.id")
       .having("COUNT(DISTINCT questions.*) = COUNT(user_responses.*)")
   end
+
+  def uncompleted_polls
+
+    joins_sql = <<-SQL
+      LEFT OUTER JOIN (
+        #{ self.responses.to_sql }
+      ) AS user_responses
+      ON
+        user_responses.answer_id = answer_choices.id
+    SQL
+
+
+    Poll
+      .joins(questions: :answer_choices)
+      .joins(joins_sql)
+      .group("polls.id")
+      .having("COUNT(DISTINCT questions.*) != COUNT(user_responses.*)")
+
+  end
 end
 
 
