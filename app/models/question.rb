@@ -43,7 +43,7 @@ class Question < ActiveRecord::Base
   def results_sql
     sql_returns = AnswerChoice.find_by_sql([<<-SQL, self.id])
       SELECT
-        answer_choices.*, COUNT(answer_responses.*) AS num_response
+        answer_choices.*, COUNT(answer_responses.*) AS response_count
       FROM
         answer_choices
       LEFT OUTER JOIN
@@ -58,7 +58,7 @@ class Question < ActiveRecord::Base
     results = {}
 
     sql_returns.each do |answer|
-      results[answer.answer] = answer.num_response
+      results[answer.answer] = answer.response_count
     end
 
     results
